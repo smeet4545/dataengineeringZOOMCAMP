@@ -1,0 +1,165 @@
+docker run ubuntu ----- docker run the ubuntu image
+
+docker run -it ubuntu  ===== This command is used to create a new container from a Docker image
+
+after this i need to check is python is available in 
+Install python 3 in docker image
+
+apt update && apt install python3
+python3 -V
+
+docker ps -a  it shows the how many container is running
+
+docker rm $(docker ps -aq) it is actually remove the all container
+
+py -m pip install pandas pyarrow    for install the pandas pyarrow
+
+first in pipeline run docker run -it ubuntu for image run
+
+in test/pipeline  run the command py pipeline.py 12 
+
+
+uv init --python 3.13 used for give python to the virtual environment
+
+Now Real Data Engineering
+
+
+
+useful docker command
+    docker stop pg-database	Graceful stop (Postgres shuts down cleanly). Container is kept — just not running.
+    docker start pg-database	Start it back up later. Data is still there.
+    docker restart pg-database	Stop + start in one go.
+    docker ps	See what's currently running.
+    docker ps -a	See all containers (running + stopped).
+    docker rm -f pg-database	Delete the container entirely (volume still keeps the data — you can docker run again and reattach it).
+    docker volume rm ny_taxi_postgres_data	Delete the data volume. Only do this if you want to wipe the database.
+
+
+
+Run the container
+
+docker run -it --rm \     this is for linux windows..
+  -e POSTGRES_USER="root" \
+  -e POSTGRES_PASSWORD="root" \
+  -e POSTGRES_DB="ny_taxi" \
+  -v ny_taxi_postgres_data:/var/lib/postgresql \
+  -p 5432:5432 \
+  postgres:18*
+
+  correct for window
+     docker run -it --name pg-database -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -e POSTGRES_DB=ny_taxi -v ny_taxi_postgres_data:/var/lib/postgresql -p 5432:5432 postgres:18
+
+
+  docker rm -f pg-database    for remove the pgdatabse container from the docker
+
+for windows
+docker run -it --name pg-database -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -e POSTGRES_DB=ny_taxi -v ny_taxi_postgres_data:/var/lib/postgresql -p 5432:5432 postgres:18
+
+Now use it to connect to Postgres:
+uv run pgcli -h localhost -p 5432 -u root -d ny_taxi 
+  the above cmd abort by npav use instead :---
+  docker exec -it pg-database psql -U root -d ny_taxi
+  
+  use the below for in this case of code
+    \d tablename	Show columns of a table
+    \l	List all databases
+    \du	List users/roles
+    \c dbname	Switch to another database
+    \q	Quit
+    \?	Full help
+
+
+
+No stale container with the same name — if you re-run and see Conflict. The container name "/pg-database" is already in use, run docker rm -f pg-database first, or docker start -a pg-database to reuse it.
+
+
+
+
+daily command
+
+Daily workflow (every time you start your PC)
+1. Start Docker Desktop
+
+Wait until Docker Desktop says "Engine running".
+
+2. Start your PostgreSQL container
+
+Open PowerShell:
+
+docker start pg-database
+
+Verify it's running:
+
+docker ps
+
+You should see:
+
+pg-database    Up
+3. Activate your virtual environment
+
+Go to your project:
+
+cd C:\Users\Admin\dataengineeringZOOMCAMP\test\pipeline
+
+Activate it:
+
+.\.venv\Scripts\activate
+
+You should see:
+
+(.venv) PS C:\Users\Admin\dataengineeringZOOMCAMP\test\pipeline>
+4. Start Jupyter
+jupyter notebook
+
+or
+
+uv run jupyter notebook
+
+(if that's how you've been starting it).
+
+5. Test the database connection
+
+Run this once in a notebook:
+
+import psycopg2
+
+conn = psycopg2.connect(
+    host="127.0.0.1",
+    port=5432,
+    database="ny_taxi",
+    user="root",
+    password="root"
+)
+
+print("✅ Connected!")
+conn.close()
+
+If that works, you're ready to continue.
+
+Using SQLAlchemy
+
+Now that the Windows PostgreSQL service is stopped, this should work after restarting the Jupyter kernel:
+
+from sqlalchemy import create_engine
+
+engine = create_engine(
+    "postgresql://root:root@127.0.0.1:5432/ny_taxi"
+)
+
+with engine.connect() as conn:
+    print("✅ SQLAlchemy Connected!")
+
+If it still fails while psycopg2.connect() succeeds, restart the Jupyter kernel (Kernel → Restart) and run only the SQLAlchemy cell again. The notebook may still be holding onto a stale connection from before we fixed the service conflict.
+
+Quick commands you'll use most often
+# Start Docker container
+docker start pg-database
+
+# Check running containers
+docker ps
+
+# Stop container
+docker stop pg-database
+
+# Open PostgreSQL shell inside the container
+docker exec -it pg-database psql -U root -d ny_taxi
