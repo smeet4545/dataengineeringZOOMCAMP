@@ -1,0 +1,125 @@
+slides link = https://docs.google.com/presentation/d/1ZCRpi5hBzPHY7awGmObv6k0mZJ11uCW-AFU3nb7KSH4/edit?slide=id.g3ef61332cee_0_0#slide=id.g3ef61332cee_0_0
+
+docker run -it --rm \
+    -e POSTGRES_USER="root" \
+    -e POSTGRES_PASSWORD="root" \
+    -e POSTGRES_DB="ny_taxi" \
+    -v ny_taxi_postgres_data:/var/lib/postgresql \
+    -p 5432:5432 \
+    postgres:18   
+     ===================== this is running the postgres image everytime it is require if you reopen the pc
+
+
+    run the postgres on server is localhost 5432 the command is  ---- this command is connect the dockerPostgres Image by localhost
+    uv run pgcli -h localhost -p 5432 -u root -d ny_taxi
+
+    uv run jupyter notebook it runs the jupyter notebook on a 8888 hist you can open in broweser
+
+
+
+    uv run jupyter nbconvert --to=script notebook.ipynb--------------------
+    [NbConvertApp] Converting notebook notebook.ipynb to script
+    [NbConvertApp] Writing 1664 bytes to notebook.py    
+
+
+
+
+
+
+for run the databse:0-------------
+
+  uv run python ingest_data.py \
+  --pg-user=root \
+  --pg-pass=root \
+  --pg-host=localhost \
+  --pg-port=5432 \
+  --pg-db=ny_taxi \
+  --target-table=yellow_taxi_trips_2021_1 \
+  --year=2021 \
+  --month=1 \
+  --chunksize=100000
+
+
+  For Run the postgres -----------------------
+
+   docker run -it --rm \
+    -e POSTGRES_USER="root" \
+    -e POSTGRES_PASSWORD="root" \
+    -e POSTGRES_DB="ny_taxi" \
+    -v ny_taxi_postgres_data:/var/lib/postgresql \
+    -p 5432:5432 \
+    --network=pg-network \
+    --name pgdatabase \
+    postgres:18  
+
+--------------------------------------------------------------------------------------------------------------
+
+For Upload the Database run the below COmmand----------
+docker run -it --rm \
+  --network=test_default \
+  taxi_ingest:v001 \
+  --pg-user=root \
+  --pg-pass=root \
+  --pg-host=pgdatabase \
+  --pg-port=5432 \
+  --pg-db=ny_taxi \
+  --target-table=yellow_taxi_trips_2021_1 \
+  --chunksize=100000
+
+--network=test_default \  the test_default will be anything you can check by command --- [ docker network ls ]
+
+
+---------------------------------------------------------------------------------------------
+
+For create or RUN PGadmin Ui on localhost 8085
+
+docker run -it \
+  -e PGADMIN_DEFAULT_EMAIL="admin@admin.com" \
+  -e PGADMIN_DEFAULT_PASSWORD="root" \
+  -v pgadmin_data:/var/lib/pgadmin \
+  -p 8085:80 \
+  --network=pg-network \
+  --name pgadmin \
+  dpage/pgadmin4
+
+-----------------------------------------------------------------------------------------------------
+
+  Run the Both Command together for two container
+  docker run -it --rm \
+    -e POSTGRES_USER="root" \
+    -e POSTGRES_PASSWORD="root" \
+    -e POSTGRES_DB="ny_taxi" \
+    -v ny_taxi_postgres_data:/var/lib/postgresql \
+    -p 5432:5432 \
+    --network=pg-network \
+    --name pgdatabase \
+    postgres:18  
+
+  docker run -it \
+  -e PGADMIN_DEFAULT_EMAIL="admin@admin.com" \
+  -e PGADMIN_DEFAULT_PASSWORD="root" \
+  -v pgadmin_data:/var/lib/pgadmin \
+  -p 8085:80 \
+  --network=pg-network \
+  --name pgadmin \
+  dpage/pgadmin4
+
+-------------------------------------------------------------------------------------------------------
+
+docker-compose up -====== this is for run the docker-compose.yaml and this files included breakdown or two docker container pgadmin or postgres this command is run both and host on 8085
+
+docker-compose up -d  dont know
+
+docker-compose down
+
+check for what running inside the docker
+docker ps -a ---- gives you what running inside the docker if anything running 
+
+docker rm $(docker ps -aq)  for remove the image from the docker
+docker ps -a command fo rcheck the status of the docker
+
+
+---------------------------------------------------------------------------------------------------
+
+command for checking the what network is running
+docker network ls

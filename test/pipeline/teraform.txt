@@ -1,0 +1,24 @@
+
+
+Why Terraform?
+
+. Simplicity in keeping track of infrastructure
+
+· Easier collaboration
+
+· Reproducibility
+
+. Ensure resources are removed
+
+
+
+What Terraform is not-
+
+. Does not manage and update code on infrastructure
+. Does not give you the ability to change immutable resources
+. Not used to manage resources not defined in your terraform files
+
+What is Terraform?
+Infrastructure as code
+
+

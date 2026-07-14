@@ -1,0 +1,42 @@
+select
+	tpep_pickup_datetime,
+	tpep_dropoff_datetime,
+	total_amount,
+	CONCAT(zpu."Borough", ' / ', zpu."Zone") AS "pick_up_loc",
+	CONCAT(zdo."Borough", ' / ', zdo."Zone") AS "dropoff_loc"
+FROM
+	yellow_taxi_trips_2021_1 t,
+	zones zpu,
+	zones zdo
+WHERE
+	t."PULocationID" = zpu."LocationID" AND
+	t."DOLocationID" = zdo."LocationID"
+LIMIT 100;
+
+
+
+Means the below query is GROUP BY how you check how many entries on which date 
+
+        select
+        CAST(tpep_dropoff_datetime AS DATE) as "day",
+        COUNT(1)
+        
+    FROM
+        yellow_taxi_trips_2021_1 t
+
+        GROUP BY
+        CAST(tpep_dropoff_datetime AS DATE);
+
+
+ Query for data fetch ascending or descending
+
+select
+	CAST(tpep_dropoff_datetime AS DATE) as "day",
+	COUNT(1) as "count"
+FROM
+	yellow_taxi_trips_2021_1 t
+GROUP BY
+	CAST(tpep_dropoff_datetime AS DATE)
+ORDER BY "count" DESC;
+
+
