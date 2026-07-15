@@ -1,0 +1,102 @@
+    Whenever you're done with a module that uses Docker, you can repeat the cleanup:
+
+    # Show disk usage
+    df -h
+
+    # Show Docker disk usage
+    docker system df
+
+    # Stop and remove Compose resources
+    docker compose down -v
+
+    # Remove unused Docker resources
+    docker system prune -af
+
+    # Remove build cache
+    docker builder prune -af
+
+    # Remove unused volumes
+    docker volume prune -f
+
+    Then verify:
+        df -h
+        docker system df
+
+
+
+
+    No. You do not need to clean Docker every time you restart your laptop.
+
+    Here's the typical workflow while you're actively learning Kestra.
+
+    Scenario 1: You shut down your laptop and come back later (same lesson)
+
+    Just start Docker again:
+
+    docker compose up
+
+    Docker will:
+
+    Reuse the existing images.
+    Reuse the existing volumes.
+    Start the existing containers.
+
+    You should not run docker system prune -af before every docker compose up, because that would delete unused images and caches, forcing Docker to download everything again.
+
+    Scenario 2: You finished today's work
+
+    When you're done for the day, stop the containers:
+
+    docker compose down
+
+    This stops and removes the containers but keeps:
+
+    Images
+    Volumes (your data)
+    Networks (if needed)
+
+    The next day:
+
+    docker compose up
+
+    Everything starts quickly.
+
+    Scenario 3: You finished the Kestra module completely
+
+    Now it's safe to reclaim disk space:
+
+    docker compose down -v
+    docker system prune -af
+    docker builder prune -af
+    docker volume prune -f
+
+    Then, when you move on to Spark or Kafka, you'll have plenty of free space.
+
+    My recommendation for Zoomcamp
+
+    During a module (Kestra, Spark, Kafka):
+
+    Work
+    ↓
+    docker compose down
+    ↓
+    Shutdown laptop
+    ↓
+    Next day
+    ↓
+    docker compose up
+
+    After completing the entire module:
+
+    docker compose down -v
+    docker system prune -af
+    docker builder prune -af
+    docker volume prune -f
+
+    This is when you free up space.
+
+    A simple rule to remember
+    Working on the same project? → docker compose down and later docker compose up.
+    Finished with the project/module? → Clean up with prune commands.
+
+    This approach saves time because Docker won't have to re-download several gigabytes of images every time you continue your work.
