@@ -123,3 +123,5 @@ docker ps -a command fo rcheck the status of the docker
 
 command for checking the what network is running
 docker network ls
+
+docker system prune -af --volumes chala ke space clear kar
