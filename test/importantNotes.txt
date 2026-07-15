@@ -124,4 +124,27 @@ docker ps -a command fo rcheck the status of the docker
 command for checking the what network is running
 docker network ls
 
-docker system prune -af --volumes chala ke space clear kar
+
+Whenever you're done with a module that uses Docker, you can repeat the cleanup:
+
+# Show disk usage
+df -h
+
+# Show Docker disk usage
+docker system df
+
+# Stop and remove Compose resources
+docker compose down -v
+
+# Remove unused Docker resources
+docker system prune -af
+
+# Remove build cache
+docker builder prune -af
+
+# Remove unused volumes
+docker volume prune -f
+
+Then verify:
+      df -h
+      docker system df
