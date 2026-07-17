@@ -23,6 +23,12 @@
         docker system df
 
 
+--------------------------------------------------------------------------------------------------
+when you shutdown the laptop today and next day you restart after shutdown
+docker-compose down
+next day 
+    again start with docker-compose up
+
 
 
     No. You do not need to clean Docker every time you restart your laptop.
@@ -100,3 +106,13 @@
     Finished with the project/module? → Clean up with prune commands.
 
     This approach saves time because Docker won't have to re-download several gigabytes of images every time you continue your work.
+
+    When to clean up
+
+ -------------------------------------------------------------------------
+
+    Only clean up when:
+
+    you've finished the Kestra module,
+    or you need disk space for Spark or Kafka,
+    or you notice free space dropping below about 5 GB.
