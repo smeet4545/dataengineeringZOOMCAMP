@@ -1,3 +1,9 @@
+# GCP credentials
+test/credentials/gcp-credentials.json
+
+# Environment files
+.env
+
 # Byte-compiled / optimized / DLL files
 *.parquet
 __pycache__/

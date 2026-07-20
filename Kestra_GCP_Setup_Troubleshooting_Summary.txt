@@ -1,0 +1,114 @@
+Kestra GCP Setup Troubleshooting Summary
+
+Initial Problem
+
+The Kestra flow failed with:
+
+Unable to find GCP_PROJECT_ID used in the expression {{envs.GCP_PROJECT_ID}}
+
+Although the .env file existed and Docker Compose loaded it, Kestra
+could not resolve the variable inside the flow.
+
+Root Causes
+
+1.  Variable reference mismatch
+
+-   The original flow used kv('KEY').
+-   It was changed to envs.GCP_PROJECT_ID.
+-   The running Kestra version did not expose these variables through
+    envs as expected.
+
+2.  Docker environment Verified with:
+
+    docker compose exec kestra printenv | grep GCP
+
+Output confirmed the variables existed inside the container.
+
+3.  Credentials Verified with:
+
+    docker compose exec kestra ls -l /credentials
+
+The service account JSON file was correctly mounted.
+
+4.  Kestra KV Store The required values were added into the namespace KV
+    Store:
+
+-   GCP_PROJECT_ID
+-   GCP_BUCKET_NAME
+-   GCP_DATASET
+-   GCP_LOCATION
+
+The flow was updated to use:
+
+    {{ kv('GCP_PROJECT_ID') }}
+    {{ kv('GCP_BUCKET_NAME') }}
+    {{ kv('GCP_DATASET') }}
+    {{ kv('GCP_LOCATION') }}
+
+This matches how the Zoomcamp example is intended to work.
+
+5.  Bucket creation error
+
+After fixing the variables, Google Cloud returned:
+
+    Project may not create storageClass REGIONAL buckets with locationConstraint US
+
+Reason:
+
+-   Storage class = REGIONAL
+-   Location = US (multi-region)
+
+These are incompatible.
+
+Fix
+
+Changed the location to a regional location, for example:
+
+    us-central1
+
+(or another regional location such as europe-west2).
+
+After updating the value and rerunning the flow:
+
+-   GCS bucket was created successfully.
+-   BigQuery dataset was created successfully.
+
+Final Working Configuration
+
+Flow:
+
+-   Uses kv() for configuration values.
+-   Uses secret('GCP_CREDS') for the service account.
+
+Docker:
+
+-   .env loads environment variables.
+-   Credentials folder mounted as /credentials.
+-   GOOGLE_APPLICATION_CREDENTIALS=/credentials/gcp-credentials.json.
+
+KV Store contains:
+
+-   GCP_PROJECT_ID
+-   GCP_BUCKET_NAME
+-   GCP_DATASET
+-   GCP_LOCATION
+
+Verification
+
+Confirmed:
+
+-   Docker environment variables available.
+-   Credentials file mounted.
+-   Flow executed successfully.
+-   Bucket appeared in Google Cloud Storage.
+-   BigQuery dataset created successfully.
+
+Lessons Learned
+
+-   kv() and envs are different mechanisms.
+-   Verify variables inside the running container.
+-   Ensure the service account file is mounted.
+-   Regional storage class requires a regional location
+    (e.g. us-central1), not US.
+-   Execute the flow only after all configuration values are correctly
+    set.
